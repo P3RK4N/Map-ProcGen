@@ -12,15 +12,27 @@ public class MapGeneratorEditor : Editor
 
         if(DrawDefaultInspector())
         {
-            if(mapGen.autoUpdate)
-            {
-                mapGen.generatePerlinNoiseMap();
-            }
+            if(mapGen.autoUpdate) refreshMap();
         }
 
-        if(GUILayout.Button("Generate Map"))
+        if(GUILayout.Button("Refresh"))
         {
-            mapGen.generateMap();
+            refreshMap();
+        }
+
+        if(GUILayout.Button("Generate radial filter"))
+        {
+            mapGen.generateRadialMask();
+        }
+
+        if(GUILayout.Button("Generate temperature filter"))
+        {
+            mapGen.generateTemperatureMask();
+        }
+
+        if(GUILayout.Button("Generate humidity filter"))
+        {
+            mapGen.generateHumidityMask();
         }
 
         if(GUILayout.Button("Generate perlin noise"))
@@ -28,9 +40,46 @@ public class MapGeneratorEditor : Editor
             mapGen.generatePerlinNoiseMap();
         }
 
+        if(GUILayout.Button("Generate voronoi noise"))
+        {
+            mapGen.generateVoronoiMap();
+        }
+
+        if(GUILayout.Button("Generate island"))
+        {
+            mapGen.generateIslandMap();
+        }
+
         if(GUILayout.Button("Apply cellular automata"))
         {
-            mapGen.generateCellularAutomataMap();
+            mapGen.applyCellularAutomata();
+        }
+
+        if(GUILayout.Button("Apply Lloyd relaxation"))
+        {
+            mapGen.applyLloydRelaxation();
+        }
+
+        void refreshMap()
+        {
+            switch(mapGen.currentMap)
+                {
+                    case MapGenerator.MAPS.NOISE:
+                        mapGen.generateRadialMask();
+                        break;
+                    case MapGenerator.MAPS.PERLIN:
+                        mapGen.generatePerlinNoiseMap();
+                        break;
+                    case MapGenerator.MAPS.ISLAND:
+                        mapGen.generateIslandMap();
+                        break;
+                    case MapGenerator.MAPS.VORONOI:
+                        mapGen.generateVoronoiMap();
+                        break;
+                    case MapGenerator.MAPS.HUMIDITY:
+                        mapGen.generateHumidityMask();
+                        break;
+                }
         }
     }
 }

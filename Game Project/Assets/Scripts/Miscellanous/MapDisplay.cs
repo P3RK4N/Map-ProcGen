@@ -6,7 +6,7 @@ public class MapDisplay : MonoBehaviour
 {
     public Renderer textureRender;
 
-    public void drawNoiseMap(ref int[,] noiseMap) 
+    public void drawMap1D(float[,] noiseMap) 
     {
         int width = noiseMap.GetLength(0);
         int height = noiseMap.GetLength(1);
@@ -25,28 +25,29 @@ public class MapDisplay : MonoBehaviour
         texture.Apply();
 
         textureRender.sharedMaterial.mainTexture = texture;
-        textureRender.transform.localScale = new Vector3(width, 1, height);
+        textureRender.transform.localScale = new Vector3(100, 1, 100);
     }
 
-    public void drawNoiseMap(ref float[,] noiseMap) 
+    public void drawMap3D(Color[,] map) 
     {
-        int width = noiseMap.GetLength(0);
-        int height = noiseMap.GetLength(1);
+        int width = map.GetLength(0);
+        int height = map.GetLength(1);
 
         Texture2D texture = new Texture2D(width, height);
-        // texture.filterMode = FilterMode.Point;
+        texture.filterMode = FilterMode.Point;
         Color[] colorMap = new Color[height*width];
 
         for(int x = 0; x < width; x++)
             for(int y = 0; y < height; y++)
             {
-                colorMap[width * x + y] = Color.Lerp(Color.black, Color.white, noiseMap[x,y]);
+                Color col = map[x, y];
+                colorMap[width * x + y] = col;
             }
 
         texture.SetPixels(colorMap);
         texture.Apply();
 
         textureRender.sharedMaterial.mainTexture = texture;
-        textureRender.transform.localScale = new Vector3(width, 1, height);
+        textureRender.transform.localScale = new Vector3(100, 1, 100);
     }
 }

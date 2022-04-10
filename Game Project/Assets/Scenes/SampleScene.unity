@@ -250,13 +250,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 90e7b9c08ee9559428bdaa482357ec18, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  seed: 309461170
   mapWidth: 100
   mapHeight: 100
-  scale: 30.22
-  octaves: 2
-  persistance: -0.4
-  lacunarity: 6.73
+  offset: {x: 5.46, y: 54.89}
+  scale: 36.8
+  octaves: 4
+  persistance: -0.5
+  lacunarity: 2.42
+  humidityOffset: {x: 2.67, y: 11.43}
+  humidityScale: 15.6
+  humidityOctaves: 4
+  humidityPersistance: 0.06
+  humidityLacunarity: 1.24
+  blockSize: 23
   autoUpdate: 1
+  noiseLimit: 0.061
+  currentMap: 2
 --- !u!114 &1341956755
 MonoBehaviour:
   m_ObjectHideFlags: 0
