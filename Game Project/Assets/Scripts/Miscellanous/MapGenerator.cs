@@ -125,6 +125,11 @@ public class MapGenerator : MonoBehaviour
         MapDisplay display = FindObjectOfType<MapDisplay>();
         display.drawMap1D(noiseMap);
     }
+    void displayMap1D(float[,] map)
+    {
+        MapDisplay display = FindObjectOfType<MapDisplay>();
+        display.drawMap1D(map);
+    }
 
     void displayMap3D(Color[,] map)
     {
