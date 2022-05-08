@@ -1,7 +1,3 @@
 # Game-project
 
-![](https://github.com/P3RK4N/Game-project/blob/master/Preview/Island%20generator.mp4)
-
-
-https://user-images.githubusercontent.com/87949029/167272500-ad466639-d41c-4af0-8647-07cc4de29bd5.mp4
-
+https://user-images.githubusercontent.com/87949029/167272832-a69007ae-1324-4172-b040-cc2af901fd48.mp4
