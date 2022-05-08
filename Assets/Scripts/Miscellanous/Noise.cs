@@ -152,9 +152,11 @@ public static class Noise
         float[,] perlinNoiseMap;
         float[,] islandMap = new float[width,height];
 
+        int passes = 0;
         //While smaller than 30% of map create next one
         while(!valid)
         {
+            passes++;
             seed = random ? Random.Range(1, 2147483647) : seed;
             perlinNoiseMap = generatePerlinNoise(width, height, seed, offset, scale, octaves, persistance, lacunarity);
 
@@ -172,7 +174,7 @@ public static class Noise
                 seed = (int)(((long)seed+1)%2147483647);
         }
 
-        Debug.Log(seed);
+        Debug.Log(string.Format("Seed: {0} - Passes: {1}",seed,passes));
 
         //Get dictionary cellCenter -> cells
         float[,] voronoiNoise = generateVoronoiNoise(width, height, blockSize, seed);
@@ -182,41 +184,34 @@ public static class Noise
             for(int y = 0; y < height; y++)
                 if(islandMap[x, y] > 0f)
                     islandMap[x, y] *= voronoiNoise[x, y];
-
+        
         applyLloydRelaxation(islandMap, blockSize);
         Dictionary<Vector2Int, List<Vector2Int>> regions = applyLloydRelaxation(islandMap, blockSize);
 
-    	//INSERT FIX FOR SPLIT AREA FUNCTION
-        regions = splitRegions(islandMap, regions);
-    	//INSERT FIX FOR SPLIT AREA FUNCTION
+        bool splitted = false;
 
-        mergeRegions(islandMap, regions);
+        regions = splitRegions(islandMap, regions, ref splitted);
+        if(splitted) mergeRegions(islandMap, regions);
 
         regions = applySmallLloydRelaxation(islandMap, regions);
 
-        //POTENTIALLY INSERT FIX FOR SPLIT HERE TOO
-        regions = splitRegions(islandMap, regions);
-        //POTENTIALLY INSERT FIX FOR SPLIT HERE TOO
+        regions = splitRegions(islandMap, regions, ref splitted);
+        if(splitted) mergeRegions(islandMap, regions);
 
-        mergeRegions(islandMap, regions);
-        
         regions = applySmallLloydRelaxation(islandMap, regions);
 
-        int step = width / 10;
-
-        while(step >= 5)
+        int step = width / 15;
+        while(step >= 4)
         {
             regions = applyVoronoiBorder(islandMap, regions, seed, step);
-            step /= 10;
+            step /= 15;
         }
-
-        //POTENTIONALLY INSERT FIX FOR SPLIT HERE TOO
-        regions = splitRegions(islandMap, regions);
-        //POTENTIONALLY INSERT FIX FOR SPLIT HERE TOO
-
-        mergeRegions(islandMap, regions);
+        
+        regions = splitRegions(islandMap, regions, ref splitted);
+        if(splitted) mergeRegions(islandMap, regions);
 
         Color[,] biomeMap = assignBiomes2(islandMap, regions);
+
         return biomeMap;
     }
 
@@ -776,7 +771,7 @@ public static class Noise
                 
                 if(minDist == float.MaxValue) 
                 {
-                    //Kurac
+                    //Sranje
                     unused.Add(currentPos);
                     continue;
                 }
@@ -884,8 +879,10 @@ public static class Noise
     }
 
     //Split splitted areas
-    public static Dictionary<Vector2Int, List<Vector2Int>> splitRegions(float[,] islandMap, Dictionary<Vector2Int, List<Vector2Int>> regions)
+    public static Dictionary<Vector2Int, List<Vector2Int>> splitRegions(float[,] islandMap, Dictionary<Vector2Int, List<Vector2Int>> regions, ref bool splitted)
     {
+        splitted = false;
+
         int width = islandMap.GetLength(0);
         int height = islandMap.GetLength(1);
 
@@ -898,14 +895,11 @@ public static class Noise
         //Fill colorValues
         foreach(List<Vector2Int> area in regions.Values) colorValues.Add(islandMap[area[0].x, area[0].y]);
 
-        //Splitting areas
+        HashSet<Vector2Int> used = new HashSet<Vector2Int>();
+
+        // Splitting areas
         foreach (KeyValuePair<Vector2Int, List<Vector2Int>> region in regions)
         {
-            //New areas with their new centres
-            // List<List<Vector2Int>> newAreas = new List<List<Vector2Int>>();
-            // List<Vector2Int> newCentres = new List<Vector2Int>();
-
-            HashSet<Vector2Int> used = new HashSet<Vector2Int>();
             int part = 0;
 
             // Passes trough every pos and DFS-es it, leaving only unconnected parts, which later form another region
@@ -918,6 +912,7 @@ public static class Noise
                 float colorValue = islandMap[currentPos.x, currentPos.y];
                 if(part > 1)
                 {
+                    splitted = true;
                     while(colorValues.Contains(colorValue)) colorValue = Random.Range(0.1f, 1.0f);
                     colorValues.Add(colorValue);
                 }
@@ -935,11 +930,12 @@ public static class Noise
                 while(DFS.Count > 0)
                 {
                     Vector2Int tmp = DFS.Pop();
+                    float prevCol = islandMap[tmp.x, tmp.y];
                     islandMap[tmp.x, tmp.y] = colorValue;
                     foreach (Vector2Int dir in directions)
                     {
                         Vector2Int nextPos = dir + tmp;
-                        if(used.Contains(nextPos) || nextPos.x < 0 || nextPos.y < 0 || nextPos.x >= width || nextPos.y >= height || islandMap[nextPos.x, nextPos.y] == 0.0f || islandMap[nextPos.x, nextPos.y] != islandMap[tmp.x, tmp.y]) continue;
+                        if(used.Contains(nextPos) || nextPos.x < 0 || nextPos.y < 0 || nextPos.x >= width || nextPos.y >= height || islandMap[nextPos.x, nextPos.y] == 0.0f || islandMap[nextPos.x, nextPos.y] != prevCol) continue;
 
                         used.Add(nextPos);
                         DFS.Push(nextPos);
@@ -949,18 +945,14 @@ public static class Noise
                 }
 
                 newCentre /= newArea.Count;
-
                 newRegions[newCentre] = newArea;
-                // newAreas.Add(newArea);
-                // newCentres.Add(newCentre);
             }
         }
-
         return newRegions;
     }
 
     // Checks if region is pointing at correct tiles
-    public static bool checkDict(float[,] islandMap, Dictionary<Vector2Int, List<Vector2Int>> regions)
+    public static void checkDict(float[,] islandMap, Dictionary<Vector2Int, List<Vector2Int>> regions)
     {
         HashSet<Vector2Int> used = new HashSet<Vector2Int>();
 
@@ -973,7 +965,8 @@ public static class Noise
                 if(val != nextVal) 
                 {
                     Debug.Log(string.Format("{0} is {1}, {2} is {3}",region.Value[0],val,point,nextVal));
-                    return false;
+                    Debug.Log("False");
+                    return;
                 }
                 used.Add(point);
             }
@@ -989,12 +982,13 @@ public static class Noise
                     if(islandMap[i,j] != 0.0f) 
                     {
                         Debug.Log("More je krivo");
-                        return false;
+                        Debug.Log("False");
+                        return;
                     }
                 }
             }
 
-        return true;
+        Debug.Log("True");
     }
 
     public static void printRegions(float[,] islandMap, Dictionary<Vector2Int, List<Vector2Int>> regions)
