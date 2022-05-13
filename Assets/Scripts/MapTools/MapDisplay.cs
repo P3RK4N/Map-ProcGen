@@ -6,10 +6,10 @@ public class MapDisplay : MonoBehaviour
 {
     public Renderer textureRender;
 
-    public void drawMap1D(float[,] noiseMap) 
+    public void drawMap1D(float[,] map) 
     {
-        int width = noiseMap.GetLength(0);
-        int height = noiseMap.GetLength(1);
+        int width = map.GetLength(0);
+        int height = map.GetLength(1);
 
         Texture2D texture = new Texture2D(width, height);
         texture.filterMode = FilterMode.Point;
@@ -17,9 +17,7 @@ public class MapDisplay : MonoBehaviour
 
         for(int x = 0; x < width; x++)
             for(int y = 0; y < height; y++)
-            {
-                colorMap[width * x + y] = Color.Lerp(Color.black, Color.white, noiseMap[x,y]);
-            }
+                colorMap[width * x + y] = Color.Lerp(Color.black, Color.white, map[x,y]);
 
         texture.SetPixels(colorMap);
         texture.Apply();
@@ -39,10 +37,7 @@ public class MapDisplay : MonoBehaviour
 
         for(int x = 0; x < width; x++)
             for(int y = 0; y < height; y++)
-            {
-                Color col = map[x, y];
-                colorMap[width * x + y] = col;
-            }
+                colorMap[width * x + y] = map[x, y];
 
         texture.SetPixels(colorMap);
         texture.Apply();

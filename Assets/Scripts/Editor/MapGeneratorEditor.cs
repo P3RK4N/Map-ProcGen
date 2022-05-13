@@ -10,63 +10,38 @@ public class MapGeneratorEditor : Editor
     {
         MapGenerator mapGen = (MapGenerator)target;
 
-        if(DrawDefaultInspector())
-        {
-            if(mapGen.autoUpdate) refreshMap();
-        }
+        if(DrawDefaultInspector()) if(mapGen.autoUpdate) refreshMap();
 
-        if(GUILayout.Button("Refresh"))
-        {
-            refreshMap();
-        }
+        if(GUILayout.Button("Refresh")) refreshMap();
 
-        if(GUILayout.Button("Generate radial filter"))
-        {
-            mapGen.generateRadialMask();
-        }
+        EditorGUILayout.Space(10);
+        GUILayout.Label("Island");
 
-        if(GUILayout.Button("Generate temperature filter"))
-        {
-            mapGen.generateTemperatureMask();
-        }
+        if(GUILayout.Button("Generate island")) mapGen.generateIslandMap();
 
-        if(GUILayout.Button("Generate humidity filter"))
-        {
-            mapGen.generateHumidityMask();
-        }
+        EditorGUILayout.Space(10);
+        GUILayout.Label("Noises");
 
-        if(GUILayout.Button("Generate perlin noise"))
-        {
-            mapGen.generatePerlinNoiseMap();
-        }
+        if(GUILayout.Button("Generate perlin noise")) mapGen.generatePerlinNoiseMap();
 
-        if(GUILayout.Button("Generate voronoi noise"))
-        {
-            mapGen.generateVoronoiMap();
-        }
+        if(GUILayout.Button("Generate voronoi noise")) mapGen.generateVoronoiNoiseMap();
 
-        if(GUILayout.Button("Generate island"))
-        {
-            mapGen.generateIslandMap();
-        }
+        EditorGUILayout.Space(10);
+        GUILayout.Label("Masks");
 
-        if(GUILayout.Button("Apply cellular automata"))
-        {
-            mapGen.applyCellularAutomata();
-        }
+        if(GUILayout.Button("Radial mask")) mapGen.generateRadialMask();
 
-        if(GUILayout.Button("Apply Lloyd relaxation"))
-        {
-            mapGen.applyLloydRelaxation();
-        }
+        EditorGUILayout.Space(10);
+        GUILayout.Label("Map algorithms");
+
+        if(GUILayout.Button("Apply cellular automata")) mapGen.applyCellularAutomata();
+
+        if(GUILayout.Button("Apply Lloyd relaxation")) mapGen.applyLloydRelaxation();
 
         void refreshMap()
         {
             switch(mapGen.currentMap)
                 {
-                    case MapGenerator.MAPS.NOISE:
-                        mapGen.generateRadialMask();
-                        break;
                     case MapGenerator.MAPS.PERLIN:
                         mapGen.generatePerlinNoiseMap();
                         break;
@@ -74,10 +49,7 @@ public class MapGeneratorEditor : Editor
                         mapGen.generateIslandMap();
                         break;
                     case MapGenerator.MAPS.VORONOI:
-                        mapGen.generateVoronoiMap();
-                        break;
-                    case MapGenerator.MAPS.HUMIDITY:
-                        mapGen.generateHumidityMask();
+                        mapGen.generateVoronoiNoiseMap();
                         break;
                 }
         }
