@@ -54,12 +54,13 @@ public class MapGenerator : MonoBehaviour
 
     //blockSize relative to mapWidth
     //scale relative to mapWidth
-    public void generateIslandMap()
+    public Color[,] generateIslandMap()
     {
         currentMap = MAPS.ISLAND;
         map3D = IslandGenerator.generateIsland(mapWidth, mapHeight, seed, (int)(mapWidth / 100f * blockSize), offset, noiseLimit, mapWidth / 100f * scale, octaves, persistance, lacunarity);
         
         displayMap3D();
+        return map3D;
     }
 
     public void generatePerlinNoiseMap()

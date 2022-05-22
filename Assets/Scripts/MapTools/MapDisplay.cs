@@ -23,7 +23,7 @@ public class MapDisplay : MonoBehaviour
         texture.Apply();
 
         textureRender.sharedMaterial.mainTexture = texture;
-        textureRender.transform.localScale = new Vector3(100, 1, 100);
+        textureRender.transform.localScale = new Vector3(1, 1, 1);
     }
 
     public void drawMap3D(Color[,] map) 
@@ -43,6 +43,6 @@ public class MapDisplay : MonoBehaviour
         texture.Apply();
 
         textureRender.sharedMaterial.mainTexture = texture;
-        textureRender.transform.localScale = new Vector3(100, 1, 100);
+        textureRender.transform.localScale = new Vector3(1, 1, 1);
     }
 }
