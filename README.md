@@ -1,4 +1,4 @@
-# Game-project
+# PROCGEN
 
 Procedural island generator, creates regions too!
 
